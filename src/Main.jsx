@@ -9,13 +9,13 @@ import Settings from './Components/Settings';
 import axios from 'axios';
 
 export default function Main() {
-  const [isOpen, setIsOpen] = useState(false); 
-  const { menu } = useParams(); 
-  const navigate = useNavigate(); 
+  const [isOpen, setIsOpen] = useState(false);
+  const { menu } = useParams();
+  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState("");
 
   const API = axios.create({
-    baseURL: "http://localhost:4000",
+    baseURL: "https://history-uz-backend.onrender.com",
   });
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function Main() {
         return Promise.reject(error);
       }
     );
-    if(!localStorage.getItem('token')) {
+    if (!localStorage.getItem('token')) {
       navigate('/auth');
     }
     return () => {
@@ -52,26 +52,31 @@ export default function Main() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
-  
-    axios.get('http://localhost:4000/api/users/me', {
+
+    axios.get('https://history-uz-backend.onrender.com/api/users/me', {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       }
     })
-    .then((response) => {
-      setUserInfo(response.data.user);
-      localStorage.setItem('id', response.data.user.id);
-    })
-    .catch((error) => {
-      console.error(error);
-      if (error.response?.status === 401) {
-        localStorage.removeItem('token');
-        navigate('/auth');
-      }
-    });
+      .then((response) => {
+        setUserInfo(response.data.user);
+        localStorage.setItem('id', response.data.user.id);
+      })
+      .catch((error) => {
+        console.error(error);
+        if (error.response?.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/auth');
+        }
+      });
   }, [navigate]);
-    
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+
   return (
     <div className="w-full min-h-screen bg-slate-100 flex flex-col">
       <div
@@ -99,7 +104,9 @@ export default function Main() {
             { name: 'news', icon: 'fa-newspaper', label: 'Yangiliklar' },
             { name: 'tests', icon: 'fa-question', label: 'Testlar' },
             { name: 'competitions', icon: 'fa-trophy', label: 'Musobaqalar' },
-            { name: 'settings', icon: 'fa-cogs', label: 'Sozlamalar' },
+            
+            // { name: 'settings', icon: 'fa-cogs', label: 'Sozlamalar' },
+            { name: 'logout', icon: 'fa-sign-out-alt', label: 'Chiqish' },
           ].map(({ name, icon, label }) => (
             <li key={name} className="navbar-item w-full">
               <button
@@ -110,15 +117,26 @@ export default function Main() {
               </button>
             </li>
           ))}
+          { userInfo && userInfo.role === 'admin' && (
+            <li key='admin' className="navbar-item w-full">
+            <button
+              onClick={() => window.open('/admin', '_blank')}
+              className={`w-full flex items-center gap-4 px-5 py-3 text-white hover:bg-green-400 transition-all duration-300`}
+            >
+              <i className={`fas fa-user-shield`}></i><span>Admin</span>
+            </button>
+          </li>
+          ) }
         </ul>
       </div>
 
       <div className="flex-1 p-4 md:ml-[250px]">
-        {menu === 'main' ? <Start user={userInfo}/> :
-         menu === 'news' ? <News /> :
-         menu === 'tests' ? <PracticeTests /> :
-         menu === 'competitions' ? <Competitions /> :
-         menu === 'settings' ? <Settings /> : <Start />}
+        {menu === 'main' ? <Start user={userInfo} /> :
+          menu === 'news' ? <News /> :
+            menu === 'tests' ? <PracticeTests /> :
+              menu === 'competitions' ? <Competitions /> :
+                menu === 'settings' ? <Settings /> :
+                  menu === 'logout' ?  handleLogout()  : <Start />}
       </div>
 
       <footer className='flex-1 p-4 md:ml-[250px] mt-5 min-h-[100px] bg-gray-300 flex flex-col items-center justify-center'>

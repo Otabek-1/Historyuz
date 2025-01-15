@@ -9,6 +9,7 @@ import NewsShow from './Components/NewsShow';
 import Competition from './Components/Competition';
 import Results from './Components/Results';
 import PracticeTest from './Components/PracticeTest';
+import AdminMain from './Admin/adminMain';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -22,7 +23,8 @@ root.render(
       <Route path='/competition/:id' element={<Competition />}/>
       <Route path='/competition/result/:id' element={<Results />}/>
       <Route path='/tests/:id' element={<PracticeTest />}/>
-
+      <Route path='/admin' element={<AdminMain />}/>
+      
     </Routes>
   </BrowserRouter>
 );

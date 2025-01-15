@@ -9,10 +9,25 @@ import axios from 'axios';
 export default function Competitions() {
     const [competitions, setCompetitions] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [user, setUser] = useState([]);
     const itemsPerPage = 3;
 
     useEffect(() => {
-        axios.get('http://localhost:4000/api/test/')
+       axios.get('https://history-uz-backend.onrender.com/api/users/me', {
+        headers:{
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+       }) 
+       .then((response) => {
+        setUser(response.data.user);
+       })
+       .catch((error) => {
+        console.log(error);
+       });
+    },[])
+    
+    useEffect(() => {
+        axios.get('https://history-uz-backend.onrender.com/api/test/')
             .then(res => {
                 setCompetitions(res.data.sessions);
             })
@@ -62,7 +77,7 @@ export default function Competitions() {
                         <tbody>
                         <tr className="border-b">
                                 <th className="py-2 text-gray-600 text-start">Batafsil</th>
-                                <td className={`py-2 font-semibold ${comp.participants.includes(localStorage.getItem('id')) && comp.participants.filter(id => id === localStorage.getItem('id')).length%2!=0 ? 'text-green-600' : 'text-red-600'}`}>{comp.participants.includes(localStorage.getItem('id')) ? 'Registered ✔️' : 'Unregistered ❌'}</td>
+                                {/* <td className={`py-2 font-semibold ${comp.participants.includes(user.id) ? 'text-green-600' : 'text-red-600'}`}>{comp.participants.includes(user.id) ? 'Registered ✔️' : 'Unregistered ❌'}</td> */}
                             </tr>
                             <tr className="border-b">
                                 <td className="py-2 text-gray-600">Boshlanish vaqti</td>

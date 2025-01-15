@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const TestApp = () => {
     const { id } = useParams('id');
@@ -8,7 +8,7 @@ const TestApp = () => {
     const [testData, setTestData] = useState(null);
 
     useEffect(() => {
-        axios.get('http://localhost:4000/api/users/me', {
+        axios.get('https://history-uz-backend.onrender.com/api/users/me', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -21,10 +21,9 @@ const TestApp = () => {
             });
     }, []);
 
-
     useEffect(() => {
         if (id) {
-            axios.get(`http://localhost:4000/api/test/${id}`, {
+            axios.get(`https://history-uz-backend.onrender.com/api/test/${id}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -38,12 +37,10 @@ const TestApp = () => {
         }
     }, [id]);
 
-    // Hozirgi vaqtni olish
     const currentDate = new Date();
 
-    // Musobaqaning holatini aniqlash
     const getStatus = () => {
-        if (!testData) return { status: "Yuklanmoqda...", color: "text-gray-600" }; // testData yuklanmagan bo'lsa
+        if (!testData) return { status: "Yuklanmoqda...", color: "text-gray-600" };
 
         const startTime = new Date(testData.starts_at);
         const endTime = new Date(testData.ends_at);
@@ -62,12 +59,13 @@ const TestApp = () => {
     const [selectedOptions, setSelectedOptions] = useState({});
     const [isRegistered, setIsRegistered] = useState(false);
     const [isTestStarted, setIsTestStarted] = useState(false);
-    const [remainingTime, setRemainingTime] = useState(testData?.duration?.hours * 3600 + testData?.duration?.seconds || 0); // Vaqtni soniyalarda saqlash
+    const [remainingTime, setRemainingTime] = useState(testData?.duration?.hours * 3600 + testData?.duration?.seconds || 0);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [showResults, setShowResults] = useState(false);
-    const [viewAllResults, setViewAllResults] = useState(false); // Barcha natijalarni ko'rish holati
-    const [resultsList, setResultsList] = useState(testData?.results || []); // Natijalar ro'yxati
-
+    const [viewAllResults, setViewAllResults] = useState(false);
+    const [resultsList, setResultsList] = useState([]);
+    const [hasParticipated, setHasParticipated] = useState(false);
+    const nav = useNavigate(null);
     const handleOptionChange = (e, questionId) => {
         setSelectedOptions({
             ...selectedOptions,
@@ -85,27 +83,73 @@ const TestApp = () => {
         setCorrectAnswersCount(correctCount);
         setShowResults(true);
 
-        // Natijalarni saqlash
-        setResultsList((prevResults) => [
-            ...prevResults,
-            { name: `${user.name}`, result: `${correctCount}`, id: user.id },
-        ]);
+        axios.post(`https://history-uz-backend.onrender.com/api/test/${testData.id}/results`, {
+            name: user.name,
+            result: correctCount,
+            id: user.id
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+        })
+            .then(res => {
+                setResultsList([...resultsList, res.data]);
+            })
+            .catch(err => {
+                console.log(err);
+            });
     };
 
     const handleRegister = () => {
-        setIsRegistered(true);
+        axios.post(`https://history-uz-backend.onrender.com/api/test/${testData.id}/participants`, { participantId: user.id }, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+        })
+            .then(res => {
+                setIsRegistered(true);
+            })
+            .catch(err => {
+                console.log(err);
+            });
     };
 
     const handleUnregister = () => {
-        setIsRegistered(false);
-        setIsTestStarted(false); // Unregister bo'lsa, testni boshlashni ham bekor qilish
+        axios.post(`https://history-uz-backend.onrender.com/api/test/${testData.id}/remove`, { participantId: user.id }, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+        })
+            .then(res => {
+                setIsRegistered(false);
+            })
+            .catch(err => {
+                console.log(err);
+            });
     };
 
     const handleStartTest = () => {
         setIsTestStarted(true);
     };
 
-    // Vaqtni yangilab borish
+    useEffect(() => {
+        if (testData) {
+            setIsRegistered(testData.participants.includes(user.id));
+            const userResult = testData.results.find(result => result.id === user.id);
+            if (userResult) {
+                setCorrectAnswersCount(userResult.result);
+                setShowResults(true);
+                setHasParticipated(true);
+            } else {
+                setShowResults(false);
+            }
+            setResultsList(testData.results);
+        }
+    }, [testData]);
+
     useEffect(() => {
         if (isTestStarted) {
             const interval = setInterval(() => {
@@ -117,30 +161,27 @@ const TestApp = () => {
                         return 0;
                     }
                 });
-            }, 1000); // 1 soniyada bir marta yangilash
+            }, 1000);
 
             return () => clearInterval(interval);
         }
     }, [isTestStarted]);
 
-    // Vaqtni formatlash
     const formatTime = (dateString) => {
         const date = new Date(dateString);
         const formatter = new Intl.DateTimeFormat("uz-UZ", {
-            weekday: "long", // Haftaning kuni
-            year: "numeric", // Yil
-            month: "long", // Oy
-            day: "numeric", // Kun
-            hour: "2-digit", // Soat
-            minute: "2-digit", // Daqiqa
-            second: "2-digit", // Sekund
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
         });
 
         return formatter.format(date);
     };
 
-
-    // Vaqt rangini aniqlash
     const getTimeColor = () => {
         if (remainingTime <= 0) return "bg-red-600";
         if (remainingTime <= testData?.duration?.hours * 3600 / 2) return "bg-yellow-600";
@@ -153,9 +194,13 @@ const TestApp = () => {
         );
     }
 
+    const handleBack = () => {
+        nav('/competitions');  // navigate to the '/tests' route
+    };
+    
+
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
-            {/* Musobaqa haqida ma'lumotlar */}
             <div className="max-w-xl w-full bg-white p-6 rounded-xl shadow-lg mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">
                     {testData.title}
@@ -171,7 +216,6 @@ const TestApp = () => {
                     Holat: {status}
                 </p>
 
-                {/* Agar musobaqa hali boshlanmagan bo'lsa, Register va Unregister */}
                 {status === "Hali boshlanmagan" && (
                     <>
                         {isRegistered ? (
@@ -192,10 +236,20 @@ const TestApp = () => {
                     </>
                 )}
 
-                {/* Agar musobaqa boshlangan bo'lsa, testni boshlash tugmasi */}
+                {hasParticipated && (
+                    <span className="text-blue-500">Siz test topshirib bo'lgansiz, natijalarni ko'rishingiz mumkin.</span>
+                )}
+
                 {status === "Boshlangan" && isRegistered && !showResults && (
                     <>
-                        {isTestStarted ? (
+                        {!isTestStarted ? (
+                            <button
+                                onClick={handleStartTest}
+                                className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            >
+                                Testni boshlash
+                            </button>
+                        ) : (
                             <div className="mt-6 max-w-xl w-full bg-white p-6 rounded-xl shadow-lg">
                                 {testData.tests.map((test) => (
                                     <div key={test.id} className="space-y-4 mb-4">
@@ -227,18 +281,10 @@ const TestApp = () => {
                                     Testni tugatish
                                 </button>
                             </div>
-                        ) : (
-                            <button
-                                onClick={handleStartTest}
-                                className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                            >
-                                Testni boshlash
-                            </button>
                         )}
                     </>
                 )}
 
-                {/* Natijalar box (hidden bo'ladi) */}
                 {showResults && (
                     <div className="mt-6 w-full bg-white p-6 rounded-xl shadow-lg">
                         <h3 className="text-xl font-semibold">Natijalar</h3>
@@ -248,13 +294,14 @@ const TestApp = () => {
                     </div>
                 )}
 
-                {/* Barcha natijalarni ko'rish */}
                 {viewAllResults && (
                     <div className="mt-6 w-full bg-white p-6 rounded-xl shadow-lg">
                         <h3 className="text-xl font-semibold">Barcha natijalar</h3>
                         <ul>
                             {resultsList.map((result, index) => (
-                                <li key={index} className="py-2">{result.name}: {result.result}</li>
+                                <li key={index} className="py-2">
+                                    <span className="font-semibold pr-5">{index + 1}.</span>
+                                    {result.name}: {result.result}</li>
                             ))}
                         </ul>
                     </div>
@@ -267,7 +314,10 @@ const TestApp = () => {
                         Barcha natijalarni ko'rish
                     </button>
                 )}
+
+                
             </div>
+            <button className="btn bg-blue-400 px-5 py-3 text-white rounded-lg hover:bg-blue-500" onClick={handleBack}>Ortga</button>
         </div>
     );
 };

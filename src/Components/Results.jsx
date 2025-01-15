@@ -1,22 +1,39 @@
-import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 
 const Results = () => {
   const { id } = useParams('id');
+  const [testData, setTestData] = useState(null);
+  const [user,setUser] = useState([]);
+  const [resultsData, setResultsData] = useState([]);
+
+  useEffect(()=>{
+    axios.get(`https://history-uz-backend.onrender.com/api/test/${id}`)
+    .then(res=>{
+      setTestData(res.data);
+      setResultsData(res.data.results);
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+
+    axios.get(`https://history-uz-backend.onrender.com/api/users/me`,{
+      headers:{
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    .then(res=>{
+      setUser(res.data.user);
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+  },[])
+
   
   // Example results data
-  const resultsData = [
-    { name: "Aliyev Vali", score: "10/30" },
-    { name: "Toirov Said", score: "15/30" },
-    { name: "Karimov Salim", score: "20/30" },
-    { name: "Ahmedov Anvar", score: "18/30" },
-    { name: "Nazarov Aziz", score: "12/30" },
-    { name: "Shomurodov Kamron", score: "22/30" },
-    { name: "Davronov Shahzod", score: "9/30" },
-    { name: "Muhammadov Umar", score: "14/30" },
-    { name: "Saidov Samir", score: "16/30" },
-    { name: "Azimov Bobur", score: "25/30" }
-  ];
+
 
   const itemsPerPage = 10;
   const totalPages = Math.ceil(resultsData.length / itemsPerPage);
@@ -39,14 +56,15 @@ const Results = () => {
          style={{ background: 'linear-gradient(to bottom, rgba(255, 255, 255, 1) 20%, rgba(34, 197, 94, 1) 100%)'}}>
         <div className="container w-[90%] min-h-screen flex flex-col p-5 rounded-lg" 
              style={{ background: 'rgba(255,255,255,.6)', backdropFilter:'blur(10px)'}}>
-            <h1 className='text-3xl font-semibold mb-5'>History tournir no {id}</h1>
+            <h1 className='text-3xl font-semibold mb-5'>{testData? testData.title:''}</h1>
+            <Link to='/main' className='bg-blue-600 text-white py-2 px-5 rounded-md w-max'>Ortga</Link>
             <ul className="w-full flex flex-col mt-5">
                 {currentResults.map((result, index) => (
-                    <li key={index} className="w-full p-4 border-b border-gray-300">
+                    <li key={index} className={`w-full p-4 border-b border-gray-300 ${result.id == user.id ? 'bg-green-100' : ''}`}>
                         <div className="flex items-center justify-between">
                             <span className="text-xl font-bold text-green-700">{(currentPage - 1) * itemsPerPage + index + 1}</span>
                             <span className="text-xl">{result.name}</span>
-                            <span className="text-lg text-gray-700">{result.score}</span>
+                            <span className="text-lg text-gray-700">{result.result}/{testData.tests_count}</span>
                         </div>
                     </li>
                 ))}

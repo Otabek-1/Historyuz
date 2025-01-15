@@ -25,7 +25,7 @@ export default function AuthForm() {
       email,
       password
     };
-    axios.post("http://localhost:4000/api/users/login", data, {
+    axios.post("https://history-uz-backend.onrender.com/api/users/login", data, {
       headers: {
         "Content-Type": "application/json"
       }
@@ -46,7 +46,7 @@ export default function AuthForm() {
       email,
       password
     };
-    axios.post("http://localhost:4000/api/users/register", data, {
+    axios.post("https://history-uz-backend.onrender.com/api/users/register", data, {
       headers: {
         "Content-Type": "application/json"
       }

@@ -11,7 +11,7 @@ export default function NewsShow() {
   const [article, setArticle] = useState([]);
   const [viewed, setViewed] = useState(false);
   useEffect(() => {
-    axios.get(`http://localhost:4000/api/articles/slug/${slug}`)
+    axios.get(`https://history-uz-backend.onrender.com/api/articles/slug/${slug}`)
       .then(res => {
         setArticle(res.data.article);
       }).catch(err => {
@@ -21,7 +21,7 @@ export default function NewsShow() {
 
   setInterval(() => {
     if(article.viewed && viewed){
-      axios.patch(`http://localhost:4000/api/articles/${article.id}/views`, { id:article.id }, {
+      axios.patch(`https://history-uz-backend.onrender.com/api/articles/${article.id}/views`, { id:article.id }, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem('token')}`

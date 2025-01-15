@@ -16,7 +16,7 @@ export default function Start({ user }) {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/articles')
+    axios.get('https://history-uz-backend.onrender.com/api/articles')
       .then(res => {
         setNewestArticles(res.data.articles.slice(0, 2));
       })
@@ -26,7 +26,7 @@ export default function Start({ user }) {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/test/')
+    axios.get('https://history-uz-backend.onrender.com/api/test/')
       .then(res => {
         const latestCompetition = res.data.sessions[res.data.sessions.length - 1];
         setCompetition(latestCompetition);

@@ -14,7 +14,7 @@ export default function News() {
   const [newsItems, setNewsItems] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/articles')
+    axios.get('https://history-uz-backend.onrender.com/api/articles')
       .then(res => {
         setNewsItems(res.data.articles);
       })

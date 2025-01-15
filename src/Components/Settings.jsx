@@ -7,11 +7,14 @@ export default function Settings() {
   const [editPhone, setEditPhone] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(' 99 228 21 08');
   const [editPassword, setEditPassword] = useState(false);
+  const [email, setEmail] = useState('burhonovotabek5@gmail.com');
+  const [name, setName] = useState('Otabek Burhonov');
   const [passwords, setPasswords] = useState({
     oldPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
+
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -40,8 +43,9 @@ export default function Settings() {
               type="text"
               id="fullname"
               className="w-full lg:w-[30%] text-lg px-4 py-2 text-black outline-none border-2 border-gray-400 focus:border-green-600 rounded disabled:text-gray-500 bg-white"
-              value="Otabek Burhonov"
-              disabled
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={!editPhone}
             />
           </div>
 
@@ -50,26 +54,27 @@ export default function Settings() {
             <input
               type="text"
               id="email"
+              disabled={!editPhone}
               className="w-full lg:w-[30%] text-lg px-4 py-2 text-black outline-none border-2 border-gray-400 focus:border-green-600 rounded disabled:text-gray-500 bg-white"
-              value="burhonovotabek5@gmail.com"
-              disabled
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
           {/* Phone Number Section */}
           <div className="flex mb-5 justify-start gap-2 flex-col">
-            <label htmlFor="phone" className="text-lg">Telefon raqam</label>
+            {/* <label htmlFor="phone" className="text-lg">Telefon raqam</label>
             <div className="flex items-center w-full lg:w-[30%] border-2 border-gray-400 rounded overflow-hidden">
               <span className="px-4 bg-gray-200 text-black">+998</span>
               <input
-                type="text"
+                type="number"
                 id="phone"
                 className="text-lg px-4 py-2 text-black w-full outline-none focus:border-green-600 border-0"
                 disabled={!editPhone}
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
               />
-            </div>
+            </div> */}
             {!editPhone ? (
               <button
                 className="mt-2 px-4 py-2 bg-green-600 text-white rounded transition hover:bg-green-700"
