@@ -136,7 +136,7 @@ export default function Main() {
             menu === 'tests' ? <PracticeTests /> :
               menu === 'competitions' ? <Competitions /> :
                 menu === 'settings' ? <Settings /> :
-                  menu === 'logout' ?  handleLogout()  : <Start />}
+                  menu === 'logout' ?  handleLogout()  :  <Start />}
       </div>
 
       <footer className='flex-1 p-4 md:ml-[250px] mt-5 min-h-[100px] bg-gray-300 flex flex-col items-center justify-center'>

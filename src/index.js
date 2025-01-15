@@ -10,6 +10,7 @@ import Competition from './Components/Competition';
 import Results from './Components/Results';
 import PracticeTest from './Components/PracticeTest';
 import AdminMain from './Admin/adminMain';
+import AddArticle from './Admin/addArticle';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -24,6 +25,7 @@ root.render(
       <Route path='/competition/result/:id' element={<Results />}/>
       <Route path='/tests/:id' element={<PracticeTest />}/>
       <Route path='/admin' element={<AdminMain />}/>
+      <Route path='/article' element={<AddArticle />}/>
       
     </Routes>
   </BrowserRouter>

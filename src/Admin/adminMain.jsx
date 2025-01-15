@@ -1,15 +1,20 @@
-import React, { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import AdminNews from './adminNews';
 import AdminTests from './adminTests';
 import AdminCompetitions from './adminCompetitions';
+import  AOS  from 'aos';
 
 export default function AdminMain() {
     const [isOpen, setIsOpen] = useState(false);
-    const { menu } = useParams();
+    const [ menu, setMenu ] = useState("adminNews");
     const navigate = useNavigate();
     const [userInfo, setUserInfo] = useState("");
-    const handleMenuClick = (menuName) => navigate(`/${menuName}`);
+    const handleMenuClick = (menuName) => setMenu(menuName);
+
+    useEffect(() => {
+        AOS.init({ duration: 1000 });
+      }, []);
     return (
         <div className="w-full min-h-screen bg-slate-100 flex flex-col">
             <div
