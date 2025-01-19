@@ -21,6 +21,19 @@ export default function AdminNews() {
       });
   }, []);
 
+  const deleteArticle = (id) =>{
+    axios.delete(`https://history-uz-backend.onrender.com/api/articles/${id}`,{
+      headers:{
+        Authorization:`Bearer ${localStorage.getItem('token')}`
+      }
+    }).then(res=>{
+      console.log(res);
+  
+    }).catch(err=>{
+      console.log(err);
+    })
+  }
+
   return (
     <div className="w-full min-h-full flex flex-col pt-9">
     <h2 data-aos="fade-right" className="lg:text-5xl sm:text-3xl text-2xl font-semibold">
@@ -36,7 +49,7 @@ export default function AdminNews() {
             className="news-card bg-white rounded-lg shadow-lg overflow-hidden hover:cursor-pointer hover:shadow-2xl transition-all duration-500"
           >
             <img
-              src={item.image? `http://localhost:4000/uploads/${item.image}`: image}
+              src={item.image? `https://history-uz-backend.onrender.com/uploads/${item.image}`: image}
               alt={item.title}
               className="w-full h-48 object-cover"
             />
@@ -49,8 +62,8 @@ export default function AdminNews() {
                 <i className="fas fa-eye mr-2"></i>{item.views}</div>
               </div>
               <div className="flex items-center gap-6 mt-1">
-              <Link className='px-4 py-2 text-white rounded-md bg-blue-600'>Tahrirlash</Link>
-              <Link className='px-4 py-2 text-white rounded-md bg-red-600'>O'chirish</Link>
+              <Link to={`/news/edit/${item.id}`} className='px-4 py-2 text-white rounded-md bg-blue-600'>Tahrirlash</Link>
+              <Link onClick={deleteArticle(item.id)} className='px-4 py-2 text-white rounded-md bg-red-600'>O'chirish</Link>
             </div>
             </div>
             

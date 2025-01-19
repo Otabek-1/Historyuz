@@ -7,7 +7,7 @@ import axios from 'axios';
 import logo from "../images/photo_2025-01-11_16-44-39.jpg";
 
 export default function Start({ user }) {
-  const [newestArticles, setNewestArticles] = useState([]);
+  const [newestArticles, setNewestArticles] = useState(null);
   const [competition, setCompetition] = useState([]);
   const [isCompetitionActive, setIsCompetitionActive] = useState(true); // Musobaqaning faolligini tekshirish uchun
 
@@ -65,100 +65,106 @@ export default function Start({ user }) {
           </Link>
         </div>
         <div className="mt-4 flex gap-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-          {newestArticles.map((article, index) => (
+          {newestArticles && newestArticles.map((article, index) => (
             <div key={index} data-aos="zoom-in" className="news-card w-full md:w-1/2 h-72 rounded-lg bg-gray-200 overflow-hidden">
+
               <img
                 src={article.image ? `http://localhost:4000/uploads/${article.image}` : logo}
                 className="w-full max-h-[45%] object-cover"
                 alt="Yangilik rasmi"
               />
+
               <div className="p-3 flex flex-col gap-2">
-                <span className="text-lg font-semibold">{article.title}</span>
-                <p className="text-sm">
-                  {article.content.length > 60 ? article.content.slice(0, 60) + "..." : article.content}
-                </p>
+                <span className="text-lg font-semibold">{article?.title || 'No title'}</span>
+                <div
+                dangerouslySetInnerHTML={{
+                  __html:article?.content && article.content.length > 60 ? article.content.slice(0, 60) + "..." : article?.content || 'No content'
+                }}
+                ></div>
                 <Link to={`/news/${article.slug}`} className="text-sm text-blue-400">
                   Batafsil
                 </Link>
               </div>
             </div>
           ))}
+
         </div>
       </section>
 
       {/* Next Competition Section */}
-      {isCompetitionActive && (
+      {isCompetitionActive && competition && (
         <section data-aos="fade-left" className="next-competition h-auto mt-10 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold">Keyingi musobaqa</h3>
-          <Link to="/competitions" className="text-sm text-blue-400">
-            Musobaqalarga o'tish
-          </Link>
-        </div>
-        <div className="w-full">
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div data-aos="flip-left" className="w-full md:w-1/3 h-72 rounded-lg flex flex-col justify-center items-center gap-3"
-              style={{ background: 'radial-gradient(circle, rgba(255,255,255,1) 17%, rgba(0,183,2,1) 100%)' }}>
-              <img src={trophyImg} className="w-1/4 md:h-1/3" alt="Musobaqa kubogi" />
-              <span className="text-lg font-semibold text-green-800 text-center">
-                {competition.title}
-              </span>
-              <Link
-                to={`/competition/${competition.id}`}
-                className="px-4 py-2 bg-green-600 text-white rounded-full border-2 border-green-600 text-sm md:text-lg transition-all hover:bg-white hover:text-green-600"
-              >
-                Qatnashish
-              </Link>
-            </div>
-            <div data-aos="fade-up" className="w-full md:w-2/3 hidden md:block p-5 rounded-lg bg-white shadow-lg">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="py-2 text-left font-semibold text-gray-700">Batafsil</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b">
-                    <td className="py-2 text-gray-600">Boshlanish vaqti</td>
-                    <td className="py-2 text-gray-600">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold">Keyingi musobaqa</h3>
+            <Link to="/competitions" className="text-sm text-blue-400">
+              Musobaqalarga o'tish
+            </Link>
+          </div>
+          <div className="w-full">
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <div data-aos="flip-left" className="w-full md:w-1/3 h-72 rounded-lg flex flex-col justify-center items-center gap-3"
+                style={{ background: 'radial-gradient(circle, rgba(255,255,255,1) 17%, rgba(0,183,2,1) 100%)' }}>
+                <img src={trophyImg} className="w-1/4 md:h-1/3" alt="Musobaqa kubogi" />
+                <span className="text-lg font-semibold text-green-800 text-center">
+                  {competition?.title || 'Musobaqa nomi mavjud emas'}
+                </span>
+
+                <Link
+                  to={`/competition/${competition.id}`}
+                  className="px-4 py-2 bg-green-600 text-white rounded-full border-2 border-green-600 text-sm md:text-lg transition-all hover:bg-white hover:text-green-600"
+                >
+                  Qatnashish
+                </Link>
+              </div>
+              <div data-aos="fade-up" className="w-full md:w-2/3 hidden md:block p-5 rounded-lg bg-white shadow-lg">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="py-2 text-left font-semibold text-gray-700">Batafsil</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b">
+                      <td className="py-2 text-gray-600">Boshlanish vaqti</td>
                       <td className="py-2 text-gray-600">
-                        {competition.starts_at
-                          ? new Date(competition.starts_at).toLocaleString('ru-RU', {
-                            weekday: 'long', // "Juma"
-                            year: 'numeric', // "2025"
-                            month: 'long', // "Yanvar"
-                            day: 'numeric', // "10"
-                            hour: '2-digit', // "10"
-                            minute: '2-digit', // "00"
-                            second: '2-digit', // "00"
-                          })
+                        <td className="py-2 text-gray-600">
+                          {competition.starts_at
+                            ? new Date(competition.starts_at).toLocaleString('ru-RU', {
+                              weekday: 'long', // "Juma"
+                              year: 'numeric', // "2025"
+                              month: 'long', // "Yanvar"
+                              day: 'numeric', // "10"
+                              hour: '2-digit', // "10"
+                              minute: '2-digit', // "00"
+                              second: '2-digit', // "00"
+                            })
+                            : 'Noma'}
+                        </td>
+
+                      </td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2 text-gray-600">Qatnashuvchilar soni</td>
+                      <td className="py-2 text-gray-600">{competition.participants ? competition.participants.length : null}</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2 text-gray-600">Davomiyligi</td>
+                      <td className="py-2 text-gray-600">
+                        {competition.starts_at && competition.ends_at
+                          ? `${Math.floor((new Date(competition.ends_at) - new Date(competition.starts_at)) / (1000 * 60 * 60))} soat`
                           : 'Noma'}
                       </td>
-
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="py-2 text-gray-600">Qatnashuvchilar soni</td>
-                    <td className="py-2 text-gray-600">{competition.participants ? competition.participants.length : null}</td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="py-2 text-gray-600">Davomiyligi</td>
-                    <td className="py-2 text-gray-600">
-                      {competition.starts_at && competition.ends_at
-                        ? `${Math.floor((new Date(competition.ends_at) - new Date(competition.starts_at)) / (1000 * 60 * 60))} soat`
-                        : 'Noma'}
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="py-2 text-gray-600">Savollar soni</td>
-                    <td className="py-2 text-gray-600">{competition.tests_count}</td>
-                  </tr>
-                </tbody>
-              </table>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="py-2 text-gray-600">Savollar soni</td>
+                      <td className="py-2 text-gray-600">{competition.tests_count}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
 
       {/* Progress Section */}

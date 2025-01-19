@@ -120,13 +120,16 @@ export default function Main() {
           { userInfo && userInfo.role === 'admin' && (
             <li key='admin' className="navbar-item w-full">
             <button
-              onClick={() => window.open('/admin', '_blank')}
+              onClick={() => navigate('/admin')}
               className={`w-full flex items-center gap-4 px-5 py-3 text-white hover:bg-green-400 transition-all duration-300`}
             >
               <i className={`fas fa-user-shield`}></i><span>Admin</span>
             </button>
           </li>
           ) }
+          <li key='tg-channel' className="navbar-item w-full">
+            <Link to='https://t.me/tarix_yozgani_keldik' className='flex items-center w-max px-6 text-white rounded-full py-3 justify-start ml-5 text-lg bg-blue-400 gap-4'><i className="fab fa-telegram-plane"></i> Telegram kanal</Link>
+          </li>
         </ul>
       </div>
 
@@ -136,7 +139,7 @@ export default function Main() {
             menu === 'tests' ? <PracticeTests /> :
               menu === 'competitions' ? <Competitions /> :
                 menu === 'settings' ? <Settings /> :
-                  menu === 'logout' ?  handleLogout()  :  <Start />}
+                  menu === 'logout' ?  handleLogout()  :  null}
       </div>
 
       <footer className='flex-1 p-4 md:ml-[250px] mt-5 min-h-[100px] bg-gray-300 flex flex-col items-center justify-center'>

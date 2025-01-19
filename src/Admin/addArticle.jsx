@@ -1,38 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Editor } from '@tinymce/tinymce-react';
 
 export default function AddArticle() {
-  const [articleData, setArticleData] = useState({
-    id: '',
-    title: '',
-    content: '',
-    author_id: '',
-    created_at: '',
-    updated_at: '',
-  });
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [authorId, setAuthorId] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setArticleData({ ...articleData, [name]: value });
-  };
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.get('https://history-uz-backend.onrender.com/api/users/me', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+      .then(res => {
+        setAuthorId(res.data.user.id);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Tokenni localStoragedan olish
     const token = localStorage.getItem('token');
-
     if (!token) {
       alert('Iltimos, avval tizimga kiring!');
       return;
     }
 
     try {
-      // Axios so'rovi
       const response = await axios.post(
         'https://history-uz-backend.onrender.com/api/articles',
         {
-          ...articleData,
+          title,
+          content,
+          author_id: authorId,
         },
         {
           headers: {
@@ -57,23 +61,26 @@ export default function AddArticle() {
           <label className="block text-sm font-medium text-gray-700">Sarlavha</label>
           <input
             type="text"
-            name="title"
-            value={articleData.title}
-            onChange={handleChange}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             required
           />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Mazmun</label>
-          <textarea
-            name="content"
-            value={articleData.content}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            required
-          ></textarea>
-        </div>       
+          <Editor
+            apiKey='55wtw6ufxz1roezqo69ju6tspgcbnqffmrjtw51wqjuh5bhw'
+            initialValue="<p>Matn yozing...</p>"
+            init={{
+              height: 500,
+              menubar: false,
+              plugins: 'link image code',
+              toolbar: 'undo redo | formatselect | bold italic | link image | code',
+            }}
+            onEditorChange={(newContent) => setContent(newContent)}
+          />
+        </div>
         <button
           type="submit"
           className="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500"

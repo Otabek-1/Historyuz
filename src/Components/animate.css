@@ -1,0 +1,9 @@
+@keyframes animate{
+    0%{
+        color: rgb(13, 206, 13);
+    }50%{
+        color: yellow;
+    }100%{
+        color: red;
+    }
+}

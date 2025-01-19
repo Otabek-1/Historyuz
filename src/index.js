@@ -11,6 +11,8 @@ import Results from './Components/Results';
 import PracticeTest from './Components/PracticeTest';
 import AdminMain from './Admin/adminMain';
 import AddArticle from './Admin/addArticle';
+import EditArticle from './Admin/editArticle';
+import AddCompetition from './Admin/addCompetition';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -23,10 +25,11 @@ root.render(
       <Route path="/news/:slug" element={<NewsShow />}/>
       <Route path='/competition/:id' element={<Competition />}/>
       <Route path='/competition/result/:id' element={<Results />}/>
-      <Route path='/tests/:id' element={<PracticeTest />}/>
+      <Route path='/practice' element={<PracticeTest />}/>
       <Route path='/admin' element={<AdminMain />}/>
       <Route path='/article' element={<AddArticle />}/>
-      
+      <Route path='/news/edit/:id' element={<EditArticle/>} />
+      <Route path='/competition/add' element={<AddCompetition />}/>
     </Routes>
   </BrowserRouter>
 );

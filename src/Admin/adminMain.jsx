@@ -3,18 +3,18 @@ import { Link, useNavigate } from 'react-router-dom'
 import AdminNews from './adminNews';
 import AdminTests from './adminTests';
 import AdminCompetitions from './adminCompetitions';
-import  AOS  from 'aos';
+import AOS from 'aos';
 
 export default function AdminMain() {
     const [isOpen, setIsOpen] = useState(false);
-    const [ menu, setMenu ] = useState("adminNews");
+    const [menu, setMenu] = useState("adminNews");
     const navigate = useNavigate();
     const [userInfo, setUserInfo] = useState("");
     const handleMenuClick = (menuName) => setMenu(menuName);
 
     useEffect(() => {
         AOS.init({ duration: 1000 });
-      }, []);
+    }, []);
     return (
         <div className="w-full min-h-screen bg-slate-100 flex flex-col">
             <div
@@ -42,6 +42,7 @@ export default function AdminMain() {
                         { name: 'adminNews', icon: 'fa-newspaper', label: 'Yangiliklar' },
                         { name: 'adminTests', icon: 'fa-question', label: 'Testlar' },
                         { name: 'adminCompetitions', icon: 'fa-trophy', label: 'Musobaqalar' },
+                        { name: 'backToUser', icon: 'fa-user-shield', label: 'User paneliga qaytish' },
 
                         // { name: 'settings', icon: 'fa-cogs', label: 'Sozlamalar' },
                         { name: 'logout', icon: 'fa-sign-out-alt', label: 'Chiqish' },
@@ -59,10 +60,11 @@ export default function AdminMain() {
             </div>
 
             <div className="flex-1 p-4 md:ml-[250px]">
-                    {menu === 'adminNews' ? <AdminNews /> :
-                        menu === 'adminTests' ? <AdminTests /> :
-                            menu === 'adminCompetitions' ? <AdminCompetitions /> : <AdminNews />}
-                  </div>
+                {menu === 'adminNews' ? <AdminNews /> :
+                    menu === 'adminTests' ? <AdminTests /> :
+                        menu === 'adminCompetitions' ? <AdminCompetitions /> :
+                            menu === 'backToUser' ? navigate('/main') : <AdminNews />}
+            </div>
         </div>
     )
 }

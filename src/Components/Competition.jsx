@@ -1,8 +1,11 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import "./animate.css";
+
 
 const TestApp = () => {
+
     const { id } = useParams('id');
     const [user, setUser] = useState([]);
     const [testData, setTestData] = useState(null);
@@ -59,19 +62,23 @@ const TestApp = () => {
     const [selectedOptions, setSelectedOptions] = useState({});
     const [isRegistered, setIsRegistered] = useState(false);
     const [isTestStarted, setIsTestStarted] = useState(false);
-    const [remainingTime, setRemainingTime] = useState(testData?.duration?.hours * 3600 + testData?.duration?.seconds || 0);
     const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
     const [showResults, setShowResults] = useState(false);
     const [viewAllResults, setViewAllResults] = useState(false);
     const [resultsList, setResultsList] = useState([]);
     const [hasParticipated, setHasParticipated] = useState(false);
     const nav = useNavigate(null);
+    const [remainingTime, setRemainingTime] = useState(30);  // Boshlang'ich vaqt (1800 soniya)
+    const duration = 30;
+
     const handleOptionChange = (e, questionId) => {
         setSelectedOptions({
             ...selectedOptions,
             [questionId]: e.target.value,
         });
     };
+
+
 
     const checkAnswer = () => {
         let correctCount = 0;
@@ -131,14 +138,12 @@ const TestApp = () => {
             });
     };
 
-    const handleStartTest = () => {
-        setIsTestStarted(true);
-    };
+    
 
     useEffect(() => {
         if (testData) {
             setIsRegistered(testData.participants.includes(user.id));
-            const userResult = testData.results.find(result => result.id === user.id);
+            const userResult = testData.results.find(result => result.id == user.id);
             if (userResult) {
                 setCorrectAnswersCount(userResult.result);
                 setShowResults(true);
@@ -150,22 +155,7 @@ const TestApp = () => {
         }
     }, [testData]);
 
-    useEffect(() => {
-        if (isTestStarted) {
-            const interval = setInterval(() => {
-                setRemainingTime((prevTime) => {
-                    if (prevTime > 0) {
-                        return prevTime - 1;
-                    } else {
-                        clearInterval(interval);
-                        return 0;
-                    }
-                });
-            }, 1000);
 
-            return () => clearInterval(interval);
-        }
-    }, [isTestStarted]);
 
     const formatTime = (dateString) => {
         const date = new Date(dateString);
@@ -182,11 +172,7 @@ const TestApp = () => {
         return formatter.format(date);
     };
 
-    const getTimeColor = () => {
-        if (remainingTime <= 0) return "bg-red-600";
-        if (remainingTime <= testData?.duration?.hours * 3600 / 2) return "bg-yellow-600";
-        return "bg-green-600";
-    };
+
 
     if (!testData) {
         return (
@@ -197,10 +183,40 @@ const TestApp = () => {
     const handleBack = () => {
         nav('/competitions');  // navigate to the '/tests' route
     };
-    
+
+    // useEffect(() => {
+    //     if (isTestStarted) {
+    //         const interval = setInterval(() => {
+    //             setRemainingTime(prevTime => {
+    //                 if (prevTime > 1) {
+    //                     return prevTime - 1;
+    //                 } else {
+    //                     clearInterval(interval);
+    //                     setShowResults(true);
+    //                     setIsTestStarted(false);
+    //                     return 0;
+    //                 }
+    //             });
+    //         }, 1000);
+    //         return () => clearInterval(interval);  // Cleanup function
+    //     }
+    // }, [isTestStarted]);
+
+
+    const handleStartTest = () => {
+        setIsTestStarted(true);
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
+            {/* <div className="time absolute w-[170px] h-[60px] right-10 text-center flex items-center justify-center border-2 border-green-600">
+                <span
+                    className="remaining text-4xl"
+                    style={{ animationName: 'animate', animationDuration: duration * 2 + 's' }}
+                >
+                    {Math.floor(remainingTime / 60)}:{remainingTime % 60 === 0 ? '00' : remainingTime % 60}
+                </span>
+            </div> */}
             <div className="max-w-xl w-full bg-white p-6 rounded-xl shadow-lg mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">
                     {testData.title}
@@ -242,7 +258,7 @@ const TestApp = () => {
 
                 {status === "Boshlangan" && isRegistered && !showResults && (
                     <>
-                        {!isTestStarted ? (
+                        {!isTestStarted && !hasParticipated ? (
                             <button
                                 onClick={handleStartTest}
                                 className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -315,7 +331,7 @@ const TestApp = () => {
                     </button>
                 )}
 
-                
+
             </div>
             <button className="btn bg-blue-400 px-5 py-3 text-white rounded-lg hover:bg-blue-500" onClick={handleBack}>Ortga</button>
         </div>

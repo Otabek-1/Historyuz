@@ -20,7 +20,7 @@ export default function NewsShow() {
   }, []);
 
   setInterval(() => {
-    if(article.viewed && viewed){
+    if(article.views && viewed){
       axios.patch(`https://history-uz-backend.onrender.com/api/articles/${article.id}/views`, { id:article.id }, {
         headers: {
           "Content-Type": "application/json",
@@ -70,7 +70,11 @@ export default function NewsShow() {
         <h1 className="text-3xl font-bold mb-4">
           {article.title}
         </h1>
-        {article.content}
+        <div
+          dangerouslySetInnerHTML={{
+            __html:article.content
+          }}
+        ></div>
         <div className="w-full flex items-center justify-between mt-4 border-t pt-4">
           <div className="flex items-center gap-4">
             <span className="text-lg text-gray-600 flex items-center gap-1">
@@ -80,12 +84,12 @@ export default function NewsShow() {
               <i className="fas fa-calendar" aria-hidden="true"></i> {article.created_at ? article.created_at.slice(0, 10) : 'loading...'}
             </span>
           </div>
-          <button
+          {/* <button
             onClick={handleLike}
             className="flex items-center gap-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
           >
             <i className="fas fa-thumbs-up" aria-hidden="true"></i> Like {article.likes ? article.likes.length : " "}
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
